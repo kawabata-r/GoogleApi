@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -68,11 +71,14 @@ public class CalendarQuickstart {
 
         // List the next 10 events from the primary calendar.
         DateTime now = new DateTime(System.currentTimeMillis());
+        String nowRfc = now.toStringRfc3339();
+        String nextMonthRfc = convertNextMonthLastDay(nowRfc);
         Events events = service.events().list("primary")
                 .setMaxResults(10)
                 .setTimeMin(now)
                 .setOrderBy("startTime")
                 .setSingleEvents(true)
+//                .setTimeMax(nextMonthLastDay)
                 .execute();
         List<Event> items = events.getItems();
         if (items.isEmpty()) {
@@ -88,4 +94,24 @@ public class CalendarQuickstart {
             }
         }
     }
+
+	private static String convertNextMonthLastDay(String nowRfc) {
+		String[] splitted = nowRfc.split("T");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+		try {
+			Date d = sdf.parse(splitted[0]);
+		} catch (ParseException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+		String[] splittedDate = splitted[0].split("-");
+		for(String s : splitted) {
+			System.out.println(s);
+		}
+		for(String s : splittedDate) {
+			System.out.println(s);
+		}
+		return null;
+	}
 }
