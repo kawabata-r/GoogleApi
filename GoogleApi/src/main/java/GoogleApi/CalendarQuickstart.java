@@ -72,13 +72,11 @@ public class CalendarQuickstart {
         // List the next 10 events from the primary calendar.
         DateTime now = new DateTime(System.currentTimeMillis());
         String nowRfc = now.toStringRfc3339();
-        String nextMonthRfc = convertNextMonthLastDay(nowRfc);
         Events events = service.events().list("primary")
-                .setMaxResults(10)
                 .setTimeMin(now)
                 .setOrderBy("startTime")
                 .setSingleEvents(true)
-//                .setTimeMax(nextMonthLastDay)
+                .setTimeMax(convertNextMonthLastDay(nowRfc))
                 .execute();
         List<Event> items = events.getItems();
         if (items.isEmpty()) {
@@ -95,23 +93,20 @@ public class CalendarQuickstart {
         }
     }
 
-	private static String convertNextMonthLastDay(String nowRfc) {
+	private static DateTime convertNextMonthLastDay(String nowRfc) {
 		String[] splitted = nowRfc.split("T");
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		java.util.Calendar c = java.util.Calendar.getInstance();
 		try {
 			Date d = sdf.parse(splitted[0]);
+			c.setTime(d);
 		} catch (ParseException e) {
-			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
+		c.add(java.util.Calendar.MONTH, 1);
+		c.set(java.util.Calendar.DATE, c.getActualMaximum(java.util.Calendar.DATE));
 
-		String[] splittedDate = splitted[0].split("-");
-		for(String s : splitted) {
-			System.out.println(s);
-		}
-		for(String s : splittedDate) {
-			System.out.println(s);
-		}
-		return null;
+		System.out.println(c.getTime().toString());
+		return new DateTime(c.getTime());
 	}
 }
